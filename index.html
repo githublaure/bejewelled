@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>ALGO MATCH</title>
+
+<style>
+body { font-family: Arial; max-width: 850px; margin: auto; padding: 20px; }
+h1 { text-align: center; }
+.block { margin-top: 30px; }
+textarea { width: 100%; height: 70px; margin-top:5px; }
+button { margin-top: 25px; padding: 12px; width:100%; }
+.result { margin-top: 30px; padding:15px; background:#f5f5f5; }
+.score { font-weight:bold; }
+</style>
+</head>
+
+<body>
+
+<h1>ALGO MATCH</h1>
+<p>Version non scientifique. Réponds honnêtement (même si c’est imparfait).</p>
+<p><i>De mon côté : besoin de connexion + espace + communication claire.</i></p>
+
+<!-- ALIGNMENT -->
+<div class="block">
+<h2>A — Alignment</h2>
+<textarea id="a1" placeholder="Vie = film : montée, stagnation ou remise en question ? Pourquoi ?"></textarea>
+<textarea id="a2" placeholder="Dans 5 ans : tu vis où, tu fais quoi, avec quel rythme ?"></textarea>
+<textarea id="a3" placeholder="Ce que tu refuses de sacrifier, même si ça te coûte"></textarea>
+</div>
+
+<!-- LIFESTYLE -->
+<div class="block">
+<h2>L — Lifestyle</h2>
+<textarea id="l1" placeholder="Décris ta journée d’hier heure par heure"></textarea>
+<textarea id="l2" placeholder="Régulier ou cycles motivation/chute ? Exemple récent"></textarea>
+<textarea id="l3" placeholder="Quand t’es vidé : tu t’isoles, compenses ou continues ?"></textarea>
+</div>
+
+<!-- GROWTH -->
+<div class="block">
+<h2>G — Growth</h2>
+<textarea id="g1" placeholder="Dernier apprentissage volontaire"></textarea>
+<textarea id="g2" placeholder="Un schéma que t’as réussi à casser"></textarea>
+<textarea id="g3" placeholder="Dernier effort que t’avais pas envie de faire"></textarea>
+</div>
+
+<!-- OUTLOOK -->
+<div class="block">
+<h2>O — Outlook</h2>
+<textarea id="o1" placeholder="Désaccord : comprendre ou avoir raison ? Exemple"></textarea>
+<textarea id="o2" placeholder="Relation : liberté, stabilité ou intensité ? Priorise"></textarea>
+<textarea id="o3" placeholder="Argent : sécurité, liberté ou performance ? Pourquoi"></textarea>
+<textarea id="o4" placeholder="Enfants : tu en veux ? pourquoi + horizon + type de parent"></textarea>
+</div>
+
+<!-- ATTACHMENT -->
+<div class="block">
+<h2>Attachement</h2>
+<textarea id="att1" placeholder="Quand quelqu’un te plaît devient distant : tu fais quoi ?"></textarea>
+<textarea id="att2" placeholder="Tu crains plus de perdre l’autre ou ton indépendance ?"></textarea>
+<textarea id="att3" placeholder="Quand c’est émotionnel : tu résous, calmes ou évites ?"></textarea>
+<textarea id="att4" placeholder="Tu parles facilement de tes émotions ? Pourquoi ?"></textarea>
+<textarea id="att5" placeholder="Relations passées : tu t’investissais plus, moins ou pareil ?"></textarea>
+</div>
+
+<!-- BONUS -->
+<div class="block">
+<h2>Bonus</h2>
+<textarea id="b1" placeholder="Un sujet sur lequel t’as changé d’avis récemment"></textarea>
+<textarea id="b2" placeholder="Qu’est-ce que tu cherches réellement aujourd’hui"></textarea>
+<textarea id="b3" placeholder="Qu’est-ce qui pourrait faire que ça ne marche pas entre nous ?"></textarea>
+</div>
+
+<button onclick="analyze()">Analyser</button>
+
+<div id="result" class="result"></div>
+
+<script>
+function scoreText(text) {
+    let score = 0;
+    text = text.toLowerCase();
+
+    if (text.length > 120) score += 2;
+    else if (text.length > 50) score += 1;
+
+    if (text.includes("par exemple") || text.match(/\d/)) score += 1;
+    if (text.includes("j'ai compris") || text.includes("je me suis rendu compte")) score += 1;
+
+    if (text.includes("je sais pas") || text.includes("jsp")) score -= 2;
+    if (text.includes("ça dépend")) score -= 1;
+
+    return score;
+}
+
+function blockScore(ids) {
+    let total = 0;
+    ids.forEach(id => {
+        total += scoreText(document.getElementById(id).value);
+    });
+    return total;
+}
+
+function detectAttachment() {
+    let text = (
+        document.getElementById("att1").value +
+        document.getElementById("att2").value +
+        document.getElementById("att3").value
+    ).toLowerCase();
+
+    if (text.includes("je m’éloigne") || text.includes("je prends de la distance")) return "évitant";
+    if (text.includes("je m’inquiète") || text.includes("je relance")) return "anxieux";
+    if (text.includes("je communique") || text.includes("je laisse de l’espace")) return "sécure";
+
+    return "indéterminé";
+}
+
+function analyze() {
+
+    let A = blockScore(["a1","a2","a3"]);
+    let L = blockScore(["l1","l2","l3"]);
+    let G = blockScore(["g1","g2","g3"]);
+    let O = blockScore(["o1","o2","o3","o4"]);
+    let ATT = blockScore(["att1","att2","att3","att4","att5"]);
+    let B = blockScore(["b1","b2","b3"]);
+
+    let total = A*2 + L*2 + O*2 + G + ATT + B;
+
+    let profile = "";
+    if (total > 50) profile = "Profil structuré, lucide et aligné.";
+    else if (total > 30) profile = "Profil intéressant mais encore partiellement flou.";
+    else profile = "Réponses superficielles ou peu engagées.";
+
+    let attachment = detectAttachment();
+
+    document.getElementById("result").innerHTML = `
+    <div class="score">Score global : ${total}</div>
+    <br>
+    Alignment : ${A}<br>
+    Lifestyle : ${L}<br>
+    Growth : ${G}<br>
+    Outlook : ${O}<br>
+    Attachement : ${ATT}<br>
+    Bonus : ${B}
+    <br><br>
+    <strong>Type d’attachement probable : ${attachment}</strong>
+    <br><br>
+    <strong>${profile}</strong>
+    `;
+}
+</script>
+
+</body>
+</html>
