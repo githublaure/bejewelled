@@ -301,7 +301,7 @@ button:hover {
     </table>
 
     <div class="actions">
-        <button onclick="analyze()">Analyser la feuille</button>
+        <button onclick="analyzeAndSend()">Analyser et envoyer les réponses</button>
     </div>
 
     <div id="result" class="result"></div>
@@ -356,6 +356,69 @@ function detectAttachment() {
     return "indéterminé";
 }
 
+
+function buildEmailBody(total, scores, attachment, profile) {
+    const questions = [
+        ["a1", "A1 — Si ta vie actuelle était un film..."],
+        ["a2", "A2 — Dans cinq ans, où te vois-tu vivre..."],
+        ["a3", "A3 — Valeurs/habitudes non négociables"],
+        ["l1", "L1 — Décris ta journée d’hier"],
+        ["l2", "L2 — Régularité d’énergie"],
+        ["l3", "L3 — Réaction quand tu te sens vidé"],
+        ["g1", "G1 — Dernier apprentissage volontaire"],
+        ["g2", "G2 — Schéma personnel cassé"],
+        ["g3", "G3 — Effort important sans envie"],
+        ["o1", "O1 — Désaccord : comprendre ou avoir raison"],
+        ["o2", "O2 — Liberté/stabilité/intensité"],
+        ["o3", "O3 — Rapport à l’argent"],
+        ["o4", "O4 — Vision des enfants"],
+        ["att1", "ATT1 — Réaction à la distance"],
+        ["att2", "ATT2 — Peur principale"],
+        ["att3", "ATT3 — Gestion de l’intensité émotionnelle"],
+        ["att4", "ATT4 — Expression des émotions"],
+        ["att5", "ATT5 — Niveau d’investissement"],
+        ["b1", "B1 — Changement d’avis récent"],
+        ["b2", "B2 — Ce que tu recherches"],
+        ["b3", "B3 — Risques pour la relation"],
+    ];
+
+    const lines = [
+        "Résultats ALGO MATCH",
+        `Score global : ${total}`,
+        `Alignment : ${scores.A}`,
+        `Lifestyle : ${scores.L}`,
+        `Growth : ${scores.G}`,
+        `Outlook : ${scores.O}`,
+        `Attachement : ${scores.ATT}`,
+        `Bonus : ${scores.B}`,
+        `Type d’attachement probable : ${attachment}`,
+        `Profil : ${profile}`,
+        "",
+        "Réponses détaillées :",
+    ];
+
+    questions.forEach(([id, label]) => {
+        const value = document.getElementById(id).value.trim() || "(sans réponse)";
+        lines.push(`${label}\n${value}\n`);
+    });
+
+    return lines.join("\n");
+}
+
+function sendAnswersByEmail(total, scores, attachment, profile) {
+    const recipient = "laureagrech@gmail.com";
+    const subject = "Réponses formulaire ALGO MATCH";
+    const body = buildEmailBody(total, scores, attachment, profile);
+    const mailto = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    window.location.href = mailto;
+}
+
+function analyzeAndSend() {
+    const result = analyze();
+    sendAnswersByEmail(result.total, result.scores, result.attachment, result.profile);
+}
+
 function analyze() {
     let A = blockScore(["a1","a2","a3"]);
     let L = blockScore(["l1","l2","l3"]);
@@ -389,6 +452,13 @@ function analyze() {
     `;
 
     openPopup();
+
+    return {
+        total,
+        attachment,
+        profile,
+        scores: { A, L, G, O, ATT, B }
+    };
 }
 
 function openPopup() {
