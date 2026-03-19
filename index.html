@@ -440,6 +440,18 @@ let latestEmailBody = "";
 let latestEmailSubject = "";
 let latestEmailCc = "";
 
+function buildFormSubmitPayload(subject, body, userEmail) {
+    return {
+        _subject: subject,
+        _template: "table",
+        _captcha: "false",
+        _cc: userEmail,
+        email_utilisateur: userEmail,
+        destinataire_principal: MAIL_RECIPIENT,
+        message: body
+    };
+}
+
 function buildEmailBody(total, scores, attachment, profile) {
     const questions = [
         ["a1", "A1 — Si ta vie actuelle était un film..."],
@@ -488,7 +500,7 @@ function buildEmailBody(total, scores, attachment, profile) {
     return lines.join("\n");
 }
 
-function sendAnswersByEmail(total, scores, attachment, profile) {
+async function sendAnswersByEmail(total, scores, attachment, profile) {
     const subject = "Réponses formulaire ALGO MATCH";
     const body = buildEmailBody(total, scores, attachment, profile);
     const userEmail = document.getElementById("userEmail").value.trim();
@@ -499,9 +511,8 @@ function sendAnswersByEmail(total, scores, attachment, profile) {
         return false;
     }
 
-    const ccParam = `&cc=${encodeURIComponent(userEmail)}`;
-    const mailto = `mailto:${MAIL_RECIPIENT}?subject=${encodeURIComponent(subject)}${ccParam}&body=${encodeURIComponent(body)}`;
     const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(MAIL_RECIPIENT)}&cc=${encodeURIComponent(userEmail)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const formSubmitUrl = `https://formsubmit.co/ajax/${encodeURIComponent(MAIL_RECIPIENT)}`;
 
     latestEmailBody = body;
     latestEmailSubject = subject;
@@ -509,14 +520,44 @@ function sendAnswersByEmail(total, scores, attachment, profile) {
 
     const debug = document.getElementById("mailDebug");
     debug.style.display = "block";
-    debug.innerHTML = `
-        <strong>Important :</strong> ce bouton ouvre ton application e-mail, mais n’envoie pas automatiquement le message.<br>
-        Si aucun brouillon ne s’ouvre, utilise <a href="${gmailUrl}" target="_blank" rel="noopener noreferrer">ce lien Gmail</a> ou copie le contenu ci-dessous.<br><br>
-        <button type="button" onclick="copyEmailBody()">Copier le texte de l’e-mail</button>
-    `;
+    debug.innerHTML = "Envoi en cours…";
 
-    window.location.href = mailto;
-    return true;
+    try {
+        const response = await fetch(formSubmitUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(buildFormSubmitPayload(subject, body, userEmail))
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok || data.success === "false") {
+            throw new Error(data.message || "Échec de l’envoi automatique");
+        }
+
+        debug.innerHTML = `
+            <strong>✅ E-mail envoyé.</strong><br>
+            Le message a été transmis à <strong>${MAIL_RECIPIENT}</strong> avec copie vers <strong>${escapeHtml(userEmail)}</strong>.<br>
+            Si tu ne reçois pas la copie rapidement, vérifie tes spams.<br><br>
+            <button type="button" onclick="copyEmailBody()">Copier le texte envoyé</button>
+        `;
+
+        return true;
+    } catch (error) {
+        const mailto = `mailto:${MAIL_RECIPIENT}?subject=${encodeURIComponent(subject)}&cc=${encodeURIComponent(userEmail)}&body=${encodeURIComponent(body)}`;
+
+        debug.innerHTML = `
+            <strong>⚠️ Envoi automatique impossible.</strong> ${escapeHtml(error.message || "Erreur inconnue")}<br>
+            Tu peux envoyer manuellement via <a href="${gmailUrl}" target="_blank" rel="noopener noreferrer">Gmail</a>.<br><br>
+            <button type="button" onclick="copyEmailBody()">Copier le texte de l’e-mail</button>
+        `;
+
+        window.location.href = mailto;
+        return false;
+    }
 }
 
 async function copyEmailBody() {
@@ -535,9 +576,9 @@ ${latestEmailBody}`;
     }
 }
 
-function analyzeAndSend() {
+async function analyzeAndSend() {
     const result = analyze();
-    const wasSent = sendAnswersByEmail(result.total, result.scores, result.attachment, result.profile);
+    const wasSent = await sendAnswersByEmail(result.total, result.scores, result.attachment, result.profile);
     if (wasSent) {
         renderSummaryPage(result);
     }
