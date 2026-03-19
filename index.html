@@ -2,79 +2,245 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>ALGO MATCH</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALGO MATCH — Survey Sheet</title>
 
 <style>
-body { font-family: Arial; max-width: 850px; margin: auto; padding: 20px; }
-h1 { text-align: center; }
-.block { margin-top: 30px; }
-textarea { width: 100%; height: 70px; margin-top:5px; }
-button { margin-top: 25px; padding: 12px; width:100%; }
-.result { margin-top: 30px; padding:15px; background:#f5f5f5; }
-.score { font-weight:bold; }
+:root {
+    --grid: #b7c9b9;
+    --header: #e7f1e8;
+    --sheet-bg: #ffffff;
+    --app-bg: #dfeadf;
+    --text: #1f2937;
+    --excel-green: #217346;
+    --excel-green-dark: #185936;
+    --excel-green-soft: #cfe8d5;
+    --highlight-yellow: #fff3a3;
+    --highlight-yellow-border: #e8c85f;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: var(--text);
+    background: var(--app-bg);
+}
+
+.page {
+    max-width: 1200px;
+    margin: 22px auto;
+    padding: 0 16px;
+}
+
+.topbar {
+    background: linear-gradient(90deg, #1b5e20 0%, var(--excel-green) 70%);
+    color: #f8fafc;
+    border-radius: 12px 12px 0 0;
+    padding: 14px 18px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.subtitle {
+    margin: 0;
+    background: #f9fffa;
+    border: 1px solid var(--grid);
+    border-top: none;
+    padding: 12px 16px;
+    font-size: 14px;
+}
+
+.sheet {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--sheet-bg);
+    border: 1px solid var(--grid);
+    border-top: none;
+}
+
+.sheet th,
+.sheet td {
+    border: 1px solid var(--grid);
+    vertical-align: top;
+}
+
+.sheet .corner,
+.sheet .col-head,
+.sheet .row-id,
+.section-title {
+    background: var(--header);
+}
+
+.sheet .corner {
+    width: 56px;
+    min-width: 56px;
+}
+
+.sheet .col-head {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--excel-green-dark);
+    padding: 8px 10px;
+    letter-spacing: 0.2px;
+}
+
+.sheet .col-head:nth-child(2) { width: 300px; }
+.sheet .col-head:nth-child(3) { width: auto; }
+
+.row-id {
+    width: 56px;
+    text-align: center;
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.section-title {
+    font-weight: 700;
+    color: var(--excel-green-dark);
+    padding: 8px 10px;
+    font-size: 13px;
+    border-left: 4px solid var(--excel-green);
+}
+
+.question-cell {
+    padding: 10px;
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.question-cell.highlight {
+    background: var(--highlight-yellow);
+    box-shadow: inset 0 0 0 1px var(--highlight-yellow-border);
+}
+
+.answer-cell {
+    padding: 4px;
+    background:
+        linear-gradient(transparent 31px, #f0f6f0 32px) top left / 100% 32px repeat-y,
+        #ffffff;
+}
+
+textarea {
+    width: 100%;
+    min-height: 82px;
+    border: 1px solid #c7d9ca;
+    border-radius: 4px;
+    resize: vertical;
+    padding: 10px;
+    font: inherit;
+    background: #fff;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--excel-green);
+    box-shadow: 0 0 0 2px rgba(33, 115, 70, 0.2);
+    background: #fbfffc;
+}
+
+.actions {
+    display: grid;
+    gap: 12px;
+    margin: 14px 0 0;
+}
+
+button {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: var(--excel-green);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button:hover {
+    background: var(--excel-green-dark);
+}
+
+.result {
+    margin-top: 14px;
+    padding: 14px;
+    background: #fbfffc;
+    border: 1px solid var(--grid);
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.score {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--excel-green-dark);
+}
+
+@media (max-width: 780px) {
+    .sheet .col-head:nth-child(2) { width: 40%; }
+    .sheet .col-head:nth-child(3) { width: 60%; }
+}
 </style>
 </head>
 
 <body>
+<div class="page">
+    <div class="topbar">ALGO MATCH — Survey Sheet</div>
+    <p class="subtitle">Version non scientifique. Réponds honnêtement (même si c’est imparfait). Design type feuille de calcul pour faire un site survey.</p>
 
-<h1>ALGO MATCH</h1>
-<p>Version non scientifique. Réponds honnêtement (même si c’est imparfait).</p>
-<p><i>De mon côté : besoin de connexion + espace + communication claire.</i></p>
+    <table class="sheet" aria-label="Questionnaire ALGO MATCH">
+        <thead>
+            <tr>
+                <th class="corner"></th>
+                <th class="col-head">COLONNE A — Question</th>
+                <th class="col-head">COLONNE B — Réponse</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td class="row-id">1</td><td class="section-title" colspan="2">A — Alignment</td></tr>
+            <tr><td class="row-id">2</td><td class="question-cell highlight">Vie = film : montée, stagnation ou remise en question ? Pourquoi ?</td><td class="answer-cell"><textarea id="a1" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">3</td><td class="question-cell">Dans 5 ans : tu vis où, tu fais quoi, avec quel rythme ?</td><td class="answer-cell"><textarea id="a2" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">4</td><td class="question-cell">Ce que tu refuses de sacrifier, même si ça te coûte</td><td class="answer-cell"><textarea id="a3" placeholder="Ta réponse..."></textarea></td></tr>
 
-<!-- ALIGNMENT -->
-<div class="block">
-<h2>A — Alignment</h2>
-<textarea id="a1" placeholder="Vie = film : montée, stagnation ou remise en question ? Pourquoi ?"></textarea>
-<textarea id="a2" placeholder="Dans 5 ans : tu vis où, tu fais quoi, avec quel rythme ?"></textarea>
-<textarea id="a3" placeholder="Ce que tu refuses de sacrifier, même si ça te coûte"></textarea>
+            <tr><td class="row-id">5</td><td class="section-title" colspan="2">L — Lifestyle</td></tr>
+            <tr><td class="row-id">6</td><td class="question-cell">Décris ta journée d’hier heure par heure</td><td class="answer-cell"><textarea id="l1" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">7</td><td class="question-cell highlight">Régulier ou cycles motivation/chute ? Exemple récent</td><td class="answer-cell"><textarea id="l2" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">8</td><td class="question-cell">Quand t’es vidé : tu t’isoles, compenses ou continues ?</td><td class="answer-cell"><textarea id="l3" placeholder="Ta réponse..."></textarea></td></tr>
+
+            <tr><td class="row-id">9</td><td class="section-title" colspan="2">G — Growth</td></tr>
+            <tr><td class="row-id">10</td><td class="question-cell">Dernier apprentissage volontaire</td><td class="answer-cell"><textarea id="g1" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">11</td><td class="question-cell">Un schéma que t’as réussi à casser</td><td class="answer-cell"><textarea id="g2" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">12</td><td class="question-cell">Dernier effort que t’avais pas envie de faire</td><td class="answer-cell"><textarea id="g3" placeholder="Ta réponse..."></textarea></td></tr>
+
+            <tr><td class="row-id">13</td><td class="section-title" colspan="2">O — Outlook</td></tr>
+            <tr><td class="row-id">14</td><td class="question-cell highlight">Désaccord : comprendre ou avoir raison ? Exemple</td><td class="answer-cell"><textarea id="o1" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">15</td><td class="question-cell">Relation : liberté, stabilité ou intensité ? Priorise</td><td class="answer-cell"><textarea id="o2" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">16</td><td class="question-cell">Argent : sécurité, liberté ou performance ? Pourquoi</td><td class="answer-cell"><textarea id="o3" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">17</td><td class="question-cell">Enfants : tu en veux ? pourquoi + horizon + type de parent</td><td class="answer-cell"><textarea id="o4" placeholder="Ta réponse..."></textarea></td></tr>
+
+            <tr><td class="row-id">18</td><td class="section-title" colspan="2">Attachement</td></tr>
+            <tr><td class="row-id">19</td><td class="question-cell highlight">Quand quelqu’un te plaît devient distant : tu fais quoi ?</td><td class="answer-cell"><textarea id="att1" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">20</td><td class="question-cell">Tu crains plus de perdre l’autre ou ton indépendance ?</td><td class="answer-cell"><textarea id="att2" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">21</td><td class="question-cell">Quand c’est émotionnel : tu résous, calmes ou évites ?</td><td class="answer-cell"><textarea id="att3" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">22</td><td class="question-cell">Tu parles facilement de tes émotions ? Pourquoi ?</td><td class="answer-cell"><textarea id="att4" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">23</td><td class="question-cell">Relations passées : tu t’investissais plus, moins ou pareil ?</td><td class="answer-cell"><textarea id="att5" placeholder="Ta réponse..."></textarea></td></tr>
+
+            <tr><td class="row-id">24</td><td class="section-title" colspan="2">Bonus</td></tr>
+            <tr><td class="row-id">25</td><td class="question-cell highlight">Un sujet sur lequel t’as changé d’avis récemment</td><td class="answer-cell"><textarea id="b1" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">26</td><td class="question-cell">Qu’est-ce que tu cherches réellement aujourd’hui</td><td class="answer-cell"><textarea id="b2" placeholder="Ta réponse..."></textarea></td></tr>
+            <tr><td class="row-id">27</td><td class="question-cell">Qu’est-ce qui pourrait faire que ça ne marche pas entre nous ?</td><td class="answer-cell"><textarea id="b3" placeholder="Ta réponse..."></textarea></td></tr>
+        </tbody>
+    </table>
+
+    <div class="actions">
+        <button onclick="analyze()">Analyser la feuille</button>
+    </div>
+
+    <div id="result" class="result"></div>
 </div>
-
-<!-- LIFESTYLE -->
-<div class="block">
-<h2>L — Lifestyle</h2>
-<textarea id="l1" placeholder="Décris ta journée d’hier heure par heure"></textarea>
-<textarea id="l2" placeholder="Régulier ou cycles motivation/chute ? Exemple récent"></textarea>
-<textarea id="l3" placeholder="Quand t’es vidé : tu t’isoles, compenses ou continues ?"></textarea>
-</div>
-
-<!-- GROWTH -->
-<div class="block">
-<h2>G — Growth</h2>
-<textarea id="g1" placeholder="Dernier apprentissage volontaire"></textarea>
-<textarea id="g2" placeholder="Un schéma que t’as réussi à casser"></textarea>
-<textarea id="g3" placeholder="Dernier effort que t’avais pas envie de faire"></textarea>
-</div>
-
-<!-- OUTLOOK -->
-<div class="block">
-<h2>O — Outlook</h2>
-<textarea id="o1" placeholder="Désaccord : comprendre ou avoir raison ? Exemple"></textarea>
-<textarea id="o2" placeholder="Relation : liberté, stabilité ou intensité ? Priorise"></textarea>
-<textarea id="o3" placeholder="Argent : sécurité, liberté ou performance ? Pourquoi"></textarea>
-<textarea id="o4" placeholder="Enfants : tu en veux ? pourquoi + horizon + type de parent"></textarea>
-</div>
-
-<!-- ATTACHMENT -->
-<div class="block">
-<h2>Attachement</h2>
-<textarea id="att1" placeholder="Quand quelqu’un te plaît devient distant : tu fais quoi ?"></textarea>
-<textarea id="att2" placeholder="Tu crains plus de perdre l’autre ou ton indépendance ?"></textarea>
-<textarea id="att3" placeholder="Quand c’est émotionnel : tu résous, calmes ou évites ?"></textarea>
-<textarea id="att4" placeholder="Tu parles facilement de tes émotions ? Pourquoi ?"></textarea>
-<textarea id="att5" placeholder="Relations passées : tu t’investissais plus, moins ou pareil ?"></textarea>
-</div>
-
-<!-- BONUS -->
-<div class="block">
-<h2>Bonus</h2>
-<textarea id="b1" placeholder="Un sujet sur lequel t’as changé d’avis récemment"></textarea>
-<textarea id="b2" placeholder="Qu’est-ce que tu cherches réellement aujourd’hui"></textarea>
-<textarea id="b3" placeholder="Qu’est-ce qui pourrait faire que ça ne marche pas entre nous ?"></textarea>
-</div>
-
-<button onclick="analyze()">Analyser</button>
-
-<div id="result" class="result"></div>
 
 <script>
 function scoreText(text) {
@@ -116,7 +282,6 @@ function detectAttachment() {
 }
 
 function analyze() {
-
     let A = blockScore(["a1","a2","a3"]);
     let L = blockScore(["l1","l2","l3"]);
     let G = blockScore(["g1","g2","g3"]);
@@ -149,6 +314,5 @@ function analyze() {
     `;
 }
 </script>
-
 </body>
 </html>
