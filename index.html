@@ -364,9 +364,9 @@ button:hover {
 
     <div class="actions">
         <div class="email-preference">
-            <label for="userEmail">Ton e-mail (optionnel, pour te mettre en copie du message)</label>
-            <input type="email" id="userEmail" placeholder="exemple@domaine.com">
-            <small>Promis, pas de spam : juste une copie de tes réponses si tu veux garder une trace ✨</small>
+            <label for="userEmail">Ton e-mail (obligatoire, pour te mettre en copie du message)</label>
+            <input type="email" id="userEmail" placeholder="exemple@domaine.com" required>
+            <small>Ce champ sert à t'envoyer automatiquement une copie de tes réponses ✨</small>
         </div>
         <button onclick="analyzeAndSend()">Analyser et envoyer les réponses</button>
         <div id="mailDebug" class="result" style="display:none"></div>
@@ -492,22 +492,20 @@ function sendAnswersByEmail(total, scores, attachment, profile) {
     const subject = "Réponses formulaire ALGO MATCH";
     const body = buildEmailBody(total, scores, attachment, profile);
     const userEmail = document.getElementById("userEmail").value.trim();
-    const isEmailFilled = userEmail.length > 0;
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail);
 
-    if (isEmailFilled && !isValidEmail) {
-        alert("Ton e-mail ne semble pas valide. Corrige-le ou laisse le champ vide 🙂");
+    if (!isValidEmail) {
+        alert("Ton e-mail est obligatoire pour recevoir une copie. Merci de saisir une adresse valide 🙂");
         return false;
     }
 
-    const ccParam = isValidEmail ? `&cc=${encodeURIComponent(userEmail)}` : "";
+    const ccParam = `&cc=${encodeURIComponent(userEmail)}`;
     const mailto = `mailto:${MAIL_RECIPIENT}?subject=${encodeURIComponent(subject)}${ccParam}&body=${encodeURIComponent(body)}`;
-    const gmailCc = isValidEmail ? `&cc=${encodeURIComponent(userEmail)}` : "";
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(MAIL_RECIPIENT)}${gmailCc}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(MAIL_RECIPIENT)}&cc=${encodeURIComponent(userEmail)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
     latestEmailBody = body;
     latestEmailSubject = subject;
-    latestEmailCc = isValidEmail ? userEmail : "";
+    latestEmailCc = userEmail;
 
     const debug = document.getElementById("mailDebug");
     debug.style.display = "block";
