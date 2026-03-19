@@ -369,6 +369,7 @@ button:hover {
             <small>Promis, pas de spam : juste une copie de tes réponses si tu veux garder une trace ✨</small>
         </div>
         <button onclick="analyzeAndSend()">Analyser et envoyer les réponses</button>
+        <div id="mailDebug" class="result" style="display:none"></div>
     </div>
 
     <div id="result" class="result"></div>
@@ -434,6 +435,11 @@ function detectAttachment() {
 }
 
 
+const MAIL_RECIPIENT = "laureagrech@gmail.com";
+let latestEmailBody = "";
+let latestEmailSubject = "";
+let latestEmailCc = "";
+
 function buildEmailBody(total, scores, attachment, profile) {
     const questions = [
         ["a1", "A1 — Si ta vie actuelle était un film..."],
@@ -483,7 +489,6 @@ function buildEmailBody(total, scores, attachment, profile) {
 }
 
 function sendAnswersByEmail(total, scores, attachment, profile) {
-    const recipient = "laureagrech@gmail.com";
     const subject = "Réponses formulaire ALGO MATCH";
     const body = buildEmailBody(total, scores, attachment, profile);
     const userEmail = document.getElementById("userEmail").value.trim();
@@ -496,10 +501,40 @@ function sendAnswersByEmail(total, scores, attachment, profile) {
     }
 
     const ccParam = isValidEmail ? `&cc=${encodeURIComponent(userEmail)}` : "";
-    const mailto = `mailto:${recipient}?subject=${encodeURIComponent(subject)}${ccParam}&body=${encodeURIComponent(body)}`;
+    const mailto = `mailto:${MAIL_RECIPIENT}?subject=${encodeURIComponent(subject)}${ccParam}&body=${encodeURIComponent(body)}`;
+    const gmailCc = isValidEmail ? `&cc=${encodeURIComponent(userEmail)}` : "";
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(MAIL_RECIPIENT)}${gmailCc}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    latestEmailBody = body;
+    latestEmailSubject = subject;
+    latestEmailCc = isValidEmail ? userEmail : "";
+
+    const debug = document.getElementById("mailDebug");
+    debug.style.display = "block";
+    debug.innerHTML = `
+        <strong>Important :</strong> ce bouton ouvre ton application e-mail, mais n’envoie pas automatiquement le message.<br>
+        Si aucun brouillon ne s’ouvre, utilise <a href="${gmailUrl}" target="_blank" rel="noopener noreferrer">ce lien Gmail</a> ou copie le contenu ci-dessous.<br><br>
+        <button type="button" onclick="copyEmailBody()">Copier le texte de l’e-mail</button>
+    `;
 
     window.location.href = mailto;
     return true;
+}
+
+async function copyEmailBody() {
+    const ccLine = latestEmailCc ? `CC: ${latestEmailCc}
+` : "";
+    const payload = `À: ${MAIL_RECIPIENT}
+${ccLine}Objet: ${latestEmailSubject}
+
+${latestEmailBody}`;
+
+    try {
+        await navigator.clipboard.writeText(payload);
+        alert("Contenu copié ✅ Tu peux le coller dans ton e-mail.");
+    } catch (error) {
+        alert("Copie automatique impossible sur ce navigateur. Sélectionne et copie manuellement depuis la page.");
+    }
 }
 
 function analyzeAndSend() {
