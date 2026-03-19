@@ -17,6 +17,9 @@
     --excel-green-soft: #cfe8d5;
     --highlight-yellow: #fff3a3;
     --highlight-yellow-border: #e8c85f;
+    --dopamine-pink: #ff4fa3;
+    --dopamine-yellow: #ffe66d;
+    --popup-shadow: rgba(24, 89, 54, 0.35);
 }
 
 * { box-sizing: border-box; }
@@ -50,6 +53,18 @@ body {
     border-top: none;
     padding: 12px 16px;
     font-size: 14px;
+}
+
+.special-banner {
+    margin: 12px 0 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 2px solid #ffffff;
+    background: linear-gradient(135deg, var(--dopamine-pink), var(--dopamine-yellow));
+    color: #0f172a;
+    font-weight: 700;
+    line-height: 1.35;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
 }
 
 .sheet {
@@ -179,6 +194,55 @@ button:hover {
     color: var(--excel-green-dark);
 }
 
+.excel-popup-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.22);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+}
+
+.excel-popup {
+    width: min(460px, 96vw);
+    border: 1px solid var(--grid);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 12px 28px var(--popup-shadow);
+}
+
+.excel-popup-title {
+    background: linear-gradient(90deg, #1b5e20 0%, var(--excel-green) 70%);
+    color: #f8fafc;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.excel-popup-body {
+    padding: 18px 16px 14px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--excel-green-dark);
+}
+
+.excel-popup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 0 14px 14px;
+}
+
+.excel-popup-actions button {
+    min-width: 94px;
+    border-radius: 6px;
+    font-size: 14px;
+    padding: 9px 12px;
+}
+
 @media (max-width: 780px) {
     .sheet .col-head:nth-child(2) { width: 40%; }
     .sheet .col-head:nth-child(3) { width: 60%; }
@@ -189,6 +253,7 @@ button:hover {
 <body>
 <div class="page">
     <div class="topbar">ALGO MATCH — Survey Sheet</div>
+    <div class="special-banner">formulaire du Petit Coeur unique destiné à "David-Boulogne- -Las Vegas -chocolat- -sucre-Racine-Aristote-directeur-commercial-conférence-cybersécurité-qui me fait rater mon bus."</div>
     <p class="subtitle">Version non scientifique. Réponds honnêtement (même si c’est imparfait) ; si tu veux, tu peux détailler avec une ou deux phrases concrètes.</p>
 
     <table class="sheet" aria-label="Questionnaire ALGO MATCH">
@@ -240,6 +305,16 @@ button:hover {
     </div>
 
     <div id="result" class="result"></div>
+</div>
+
+<div id="excelPopupBackdrop" class="excel-popup-backdrop" role="dialog" aria-modal="true" aria-labelledby="excelPopupTitle">
+    <div class="excel-popup">
+        <div id="excelPopupTitle" class="excel-popup-title">ALGO MATCH — Notification</div>
+        <div class="excel-popup-body">félicitationstu es l'homme idéal</div>
+        <div class="excel-popup-actions">
+            <button type="button" onclick="closePopup()">OK</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -312,6 +387,16 @@ function analyze() {
     <br><br>
     <strong>${profile}</strong>
     `;
+
+    openPopup();
+}
+
+function openPopup() {
+    document.getElementById("excelPopupBackdrop").style.display = "flex";
+}
+
+function closePopup() {
+    document.getElementById("excelPopupBackdrop").style.display = "none";
 }
 </script>
 </body>
