@@ -446,6 +446,8 @@ function buildFormSubmitPayload(subject, body, userEmail) {
         _template: "table",
         _captcha: "false",
         _cc: userEmail,
+        _autoresponse: `Copie de tes réponses ALGO MATCH\n\n${body}`,
+        email: userEmail,
         email_utilisateur: userEmail,
         destinataire_principal: MAIL_RECIPIENT,
         message: body
@@ -540,7 +542,8 @@ async function sendAnswersByEmail(total, scores, attachment, profile) {
 
         debug.innerHTML = `
             <strong>✅ E-mail envoyé.</strong><br>
-            Le message a été transmis à <strong>${MAIL_RECIPIENT}</strong> avec copie vers <strong>${escapeHtml(userEmail)}</strong>.<br>
+            Le message a été transmis à <strong>${MAIL_RECIPIENT}</strong>.<br>
+            Une copie automatique est demandée à <strong>${escapeHtml(userEmail)}</strong> (CC + auto-réponse).<br>
             Si tu ne reçois pas la copie rapidement, vérifie tes spams.<br><br>
             <button type="button" onclick="copyEmailBody()">Copier le texte envoyé</button>
         `;
